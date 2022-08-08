@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Service Worker Zip Experiment</title>
+
+    <style>
+        li:not(:last-of-type) {
+            padding-bottom: 1.0em;
+        }
+    </style>
+
+    <!-- Use ShowdownJS to render the README file -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+
+    <!-- Use JSZip for accessing contents of zip archives -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  </head>
+
+  <body>
+    <div id="readme"></div>
+
+    <hr />
+
+    <ol>
+
+        <li> <button id="load">Download zip archive to IndexedDB</button> <span id="loadstatus"></span>
+        <li> <button id="display">Display image from zip archive</button>
+
+    </ol>
+
+    <figure>
+        <img id="image">
+        <figcaption id="caption"></figcaption>
+    </figure>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
