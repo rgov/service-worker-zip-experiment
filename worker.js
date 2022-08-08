@@ -1,10 +1,18 @@
-// On installation of this service worker, connect to the database
+// On installation of this service worker, prepare our dependencies
 let db;
 self.addEventListener("install", (e) => {
     console.log("Service Worker: Installing");
 
-    // Wait until we are connected to the database before we consider ourselves
-    // "installed".
+    // Load JSZip from the CDN
+    e.waitUntil((async () => {
+        const url = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+        const request = await fetch(url);
+
+        console.log("Service Worker: JSZip has arrived");
+        eval(await request.text());
+    })());
+
+    // Connect to the database
     e.waitUntil(new Promise((resolve, reject) => {
         const request = indexedDB.open("db");
 
