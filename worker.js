@@ -49,13 +49,41 @@ self.addEventListener("activate", (e) => {
 
 
 self.addEventListener("fetch", (e) => {
-    console.log("Service Worker: Handling fetch to", e.request.url);
+    console.log(`Service Worker: Handling fetch to ${e.request.url}`);
 
     // Pass through any requests that do not appear relevant
-    if (!(new URL(e.request.url)).pathname.startsWith("/localzip/")) {
+    const url = new URL(e.request.url);
+    if (!url.pathname.startsWith("/localzip/")) {
         e.respondWith(fetch(e.request));
         return;
     }
 
-    console.log("I will intercept this request!");
+    // Determine the requested archive resource by dropping the URL prefix
+    const resource = "archive/" + url.pathname.split("/").slice(2).join("/");
+    console.log(`Service Worker: Serving ${resource} from zip archive`);
+
+    e.respondWith(getFromZip(resource));
 });
+
+
+function getFromZip(resource) {
+    return new Promise((resolve, reject) => {
+        // Get the zip file out of IndexedDB
+        const transaction = db.transaction(["zip"]);
+        const store = transaction.objectStore("zip");
+        const request = store.get(0 /* key */);
+
+        // Once we have it, extract the requested resource
+        request.onsuccess = async () => {
+            const zip = new JSZip();
+            await zip.loadAsync(request.result);
+
+            const file = zip.file(resource);
+            if (file) {
+                resolve(new Response(await file.async("arraybuffer")));
+            } else {
+                resolve(new Response(null, { status: 404 }));
+            };
+        };
+    });
+}
