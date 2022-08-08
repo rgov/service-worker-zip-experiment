@@ -1,9 +1,3 @@
-// Figure out the path from which this code is being served. The service
-// worker's scope must be a child of this path.
-const basepath = (
-    new URL(window.location.href).pathname.split("/").slice(0,-1).join("/")
-);
-
 // Fetch and render the README text
 (async () => {
     const response = await fetch("README.md");
@@ -15,10 +9,15 @@ const basepath = (
 // Function to start the service worker once the database is ready
 const registerServiceWorker = () => {
     console.log("Registering service worker");
-    navigator.serviceWorker.register(
-        "worker.js",
-        { scope: `${basepath}/localzip/` }
-    );
+
+    // The default scope for the service worker is the same directory as the
+    // service worker script.
+    //
+    // Note that the service worker can only take control of pages loaded from
+    // the same directory as the service worker script, like our index.html,
+    // or in a subdirectory. Alternatively look into the Service-Worker-Allowed
+    // header.
+    navigator.serviceWorker.register("worker.js");
 };
 
 // Create an IndexedDB database
@@ -60,7 +59,7 @@ document.getElementById("load").addEventListener("click", async (e) => {
 
 // Click event handler for Display button
 document.getElementById("display").addEventListener("click", (e) => {
-    document.getElementById("image").src = `${basepath}/localzip/maeby.jpg`;
+    document.getElementById("image").src = "/localzip/maeby.jpg";
 });
 
 // Load event handler for image, to update caption with URL

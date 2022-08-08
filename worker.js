@@ -41,5 +41,13 @@ self.addEventListener("activate", (e) => {
 
 
 self.addEventListener("fetch", (e) => {
-    console.log("fetch");
+    console.log("Service Worker: Handling fetch to", e.request.url);
+
+    // Pass through any requests that do not appear relevant
+    if (!(new URL(e.request.url)).pathname.startsWith("/localzip/")) {
+        e.respondWith(fetch(e.request));
+        return;
+    }
+
+    console.log("I will intercept this request!");
 });
